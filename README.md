@@ -59,38 +59,4 @@ Testbench: **`tb_gpio_32`**
 
 ### Data & Control Flow
 
-```text
-              +-----------------------------+
- APB Bus ---> |  gpio_32_apb_regs           |
- (PSEL,       |  - gpio_dir                 |
-  PADDR,      |  - gpio_out_reg             |
-  PWDATA,     |  - int_mask/type/polarity   |
-  PWRITE,     |  - debounce_cfg             |
-  PENABLE)    |  - int_clear (W1C)          |
-              +-------------+---------------+
-                            |
-                            v
-              +-------------+--------------+
-              |  gpio_32_pins              |
-              |  - gpio_oe (dir)           |
-gpio_in_raw-->|  - gpio_out                |--> gpio_out
-(pads)        |  - 2FF sync -> sync_gpio_in|--> gpio_oe
-              +-------------+--------------+
-                            |
-                            v
-              +-------------+--------------+
-              |  gpio_32_debounce          |
-              |  - debounce_cfg            |
-              |  - debounced_gpio_in       |
-              +-------------+--------------+
-                            |
-                            v
-              +-------------+-------------------------+
-              |  gpio_32_interrupts                  |
-              |  - edge enables (rise/fall)          |
-              |  - level set (high/low)             |
-              |  - int_status (sticky, W1C)         |
-              +-------------+------------------------+
-                            |
-                            v
-                         gpio_irq
+
