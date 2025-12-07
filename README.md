@@ -84,34 +84,43 @@ The architecture is designed around a unidirectional data flow for configuration
 
 ```mermaid
 graph TD
-    subgraph "CPU / Bus Master"
-    APB[APB Bus Interface]
+    %% הגדרת סגנונות
+    classDef external fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef rtl fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
+    classDef top fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,stroke-dasharray: 5 5;
+
+    %% גורמים חיצוניים
+    CPU[CPU / APB Master]:::external
+    Pads((Physical Pads)):::external
+
+    %% המודול הראשי והתתי-מודולים
+    subgraph Top_Level ["Top Level Integration <br/> (gpio_32_top.v)"]
+        
+        Regs["APB Register File <br/> (gpio_32_apb_regs.v)"]:::rtl
+        
+        Pins["Pins Interface & Sync <br/> (gpio_32_pins.v)"]:::rtl
+        
+        Debounce["Debounce Engine <br/> (gpio_32_debounce.v)"]:::rtl
+        
+        IntCtrl["Interrupt Controller <br/> (gpio_32_interrupts.v)"]:::rtl
+
     end
 
-    subgraph "GPIO Peripheral"
-    Regs[APB Register File]
-    IntCtrl[Interrupt Controller]
-    Debounce[Debounce Engine]
-    Sync[2FF Synchronizer]
-    Pins[Pin Interface]
-    end
+    %% --- חיבורים וזרימת מידע ---
 
-    subgraph "External World"
-    Pads((Physical Pads))
-    end
-
-    %% Write Path
-    APB -- "PWDATA (Write)" --> Regs
-    Regs -- "GPIO_OUT / DIR" --> Pins
+    %% 1. נתיב כתיבה (Write Path)
+    CPU -- "PWDATA (Write)" --> Regs
+    Regs -- "gpio_out / gpio_dir" --> Pins
     Pins -- "Drive Output" --> Pads
 
-    %% Read Path
-    Pads -- "Raw Input" --> Sync
-    Sync -- "Synchronized" --> Debounce
-    Debounce -- "Stable Signal" --> Regs
-    Regs -- "PRDATA (Read)" --> APB
+    %% 2. נתיב קריאה (Read Path)
+    Pads -- "gpio_in_raw (Async)" --> Pins
+    Pins -- "sync_gpio_in" --> Debounce
+    Debounce -- "debounced_gpio_in" --> Regs
+    Regs -- "PRDATA (Read)" --> CPU
 
-    %% Interrupt Path
-    Debounce -- "Clean Edges" --> IntCtrl
-    Regs -- "Mask / Polarity" --> IntCtrl
-    IntCtrl -- "IRQ Signal" --> APB
+    %% 3. נתיב פסיקות (Interrupt Path)
+    Debounce -- "Clean Signal" --> IntCtrl
+    Regs -- "Config (Mask/Type/Pol)" --> IntCtrl
+    Regs -- "Config (Debounce Cycles)" --> Debounce
+    IntCtrl -- "gpio_irq" --> CPU
