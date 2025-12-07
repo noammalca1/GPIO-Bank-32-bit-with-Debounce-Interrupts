@@ -152,15 +152,3 @@ graph TD
 
 
 
-**Waveform Analysis - Step-by-Step:**
-
-1.  **Direction Configuration (Step 1):**
-    Upon the clock's rising edge, `PSEL` and `PWRITE` assert high, and `PWDATA` is set to `0xFF`. `PADDR` points to `ADDR_GPIO_DIR` (`0x00`).
-    Crucially, the data is latched into the internal `gpio_dir` register only during the **Access Phase**, when **`PENABLE` goes high**. This update immediately propagates to `gpio_oe`, enabling the drivers for the 8 Least Significant Bits (LSBs).
-
-2.  **Output Data Drive (Step 2):**
-    The bus then targets `ADDR_GPIO_OUT` (`0x04`) with the value `0xA5A500FF`.
-    Once again, on the rising edge where **`PENABLE` asserts high**, the `gpio_out_reg` updates to `0xA5A500FF`. Simultaneously, the `gpio_out` signal reflects this value.
-    **Observation:** Although `gpio_out` holds the full `0xA5A500FF` pattern, since we only configured the lower 8 bits as outputs in the previous step, the physical effect is masked. Only the `0xFF` portion is actively driven to the pads, while the upper bits (containing `0xA5A5`) remain in a high-impedance state (Hi-Z).
-
-
