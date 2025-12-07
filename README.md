@@ -20,14 +20,10 @@ The design is fully modular and built from the ground up to handle real-world GP
 - [System Overview](#system-overview)
 - [Modules Description](#modules-description)
     - [APB Register Map](#apb-register-map)
-    - [GPIO Direction & Data Path](#gpio-direction--data-path)
-    - [Debounce Architecture](#debounce-architecture)
-    - [Interrupt System](#interrupt-system)
-    - [Top-Level Integration](#top-level-integration)
+- [Data & Control Flow](#data--control-flow)
 - [Verification Testbench](#verification-testbench)
+    - [Deep Dive: Test 1 Analysis](#-deep-dive-test-1-analysis-direction--output)
 - [Simulation and Waveforms](#simulation-and-waveforms)
-- [Design Insights](#design-insights)
-- [Future Improvements](#future-improvements)
 - [License](#license)
 
 ---
@@ -100,6 +96,7 @@ Top-level module: **`gpio_32_top`** Testbench: **`tb_gpio_32`**
     - **Verification Testbench** – [`tb.v`](Verilog_Code/tb.v)  
       A comprehensive SystemVerilog testbench.
       - **Tests:** Includes directed tests for basic I/O, glitch injection (to prove debounce), rising-edge detection, and level-triggered interrupt clearance sequences.
+
 ---
 
 ## Data & Control Flow
@@ -148,7 +145,3 @@ graph TD
     
     %% Interrupt Notification
     IntCtrl -- "Event Notification (IRQ)" --> APB
-
-
-
-
