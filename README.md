@@ -150,4 +150,3 @@ graph TD
     IntCtrl -- "Event Notification (IRQ)" --> APB
 
 
-תעדכן לי את זה פה ותשלח לי את הקוד המלא Verification Testbench אני רוצה שזה יהיה תחת הכותרת הזו בתור תת כותרת של טסט 1 
