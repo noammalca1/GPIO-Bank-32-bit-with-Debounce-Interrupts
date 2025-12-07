@@ -84,43 +84,33 @@ The architecture is designed around a unidirectional data flow for configuration
 
 ```mermaid
 graph TD
-    %% הגדרת סגנונות
-    classDef external fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef rtl fill:#e1f5fe,stroke:#0277bd,stroke-width:2px;
-    classDef top fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,stroke-dasharray: 5 5;
-
-    %% גורמים חיצוניים
-    CPU[CPU / APB Master]:::external
-    Pads((Physical Pads)):::external
-
-    %% המודול הראשי והתתי-מודולים
-    subgraph Top_Level ["Top Level Integration <br/> (gpio_32_top.v)"]
-        
-        Regs["APB Register File <br/> (gpio_32_apb_regs.v)"]:::rtl
-        
-        Pins["Pins Interface & Sync <br/> (gpio_32_pins.v)"]:::rtl
-        
-        Debounce["Debounce Engine <br/> (gpio_32_debounce.v)"]:::rtl
-        
-        IntCtrl["Interrupt Controller <br/> (gpio_32_interrupts.v)"]:::rtl
-
+    subgraph "CPU / Bus Master"
+    APB[APB Bus Interface]
     end
 
-    %% --- חיבורים וזרימת מידע ---
+    subgraph "GPIO Peripheral (Top Level)"
+    Regs["APB Register File<br/>(gpio_32_apb_regs.v)"]
+    IntCtrl["Interrupt Controller<br/>(gpio_32_interrupts.v)"]
+    Debounce["Debounce Engine<br/>(gpio_32_debounce.v)"]
+    Sync["Pin Interface & Sync<br/>(gpio_32_pins.v)"]
+    end
 
-    %% 1. נתיב כתיבה (Write Path)
-    CPU -- "PWDATA (Write)" --> Regs
-    Regs -- "gpio_out / gpio_dir" --> Pins
-    Pins -- "Drive Output" --> Pads
+    subgraph "External World"
+    Pads((Physical Pads))
+    end
 
-    %% 2. נתיב קריאה (Read Path)
-    Pads -- "gpio_in_raw (Async)" --> Pins
-    Pins -- "sync_gpio_in" --> Debounce
-    Debounce -- "debounced_gpio_in" --> Regs
-    Regs -- "PRDATA (Read)" --> CPU
+    %% Write Path
+    APB -- "PWDATA" --> Regs
+    Regs -- "gpio_out / dir" --> Sync
+    Sync -- "Drive" --> Pads
 
-    %% 3. נתיב פסיקות (Interrupt Path)
-    Debounce -- "Clean Signal" --> IntCtrl
-    Regs -- "Config (Mask/Type/Pol)" --> IntCtrl
-    Regs -- "Config (Debounce Cycles)" --> Debounce
-    IntCtrl -- "gpio_irq" --> CPU
+    %% Read Path
+    Pads -- "Raw Input" --> Sync
+    Sync -- "Synchronized" --> Debounce
+    Debounce -- "Stable Signal" --> Regs
+    Regs -- "PRDATA" --> APB
+
+    %% Interrupt Path
+    Regs -- "Config (Mask/Pol)" --> IntCtrl
+    Debounce -- "Clean Edges" --> IntCtrl
+    IntCtrl -- "gpio_irq" --> APB
