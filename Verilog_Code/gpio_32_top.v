@@ -1,0 +1,171 @@
+// -----------------------------------------------------------------------------
+// GPIO 32-bit Top Level
+//  - APB register file        : gpio_32_apb_regs
+//  - Pins + 2FF sync          : gpio_32_pins
+//  - Debounce                 : gpio_32_debounce
+//  - Interrupt controller     : gpio_32_interrupts
+// ----------------------------------------------------------------------------- 
+module gpio_32_top (
+    // Clock / reset
+    input  wire         PCLK,
+    input  wire         PRESETn,
+
+    // APB slave interface
+    input  wire         PSEL,
+    input  wire         PENABLE,
+    input  wire         PWRITE,
+    input  wire [7:0]   PADDR,
+    input  wire [31:0]  PWDATA,
+    output wire [31:0]  PRDATA,
+    output wire         PREADY,
+    output wire         PSLVERR,
+
+    // Physical GPIO pins
+    input  wire [31:0]  gpio_in_raw,   // external raw inputs from pads
+    output wire [31:0]  gpio_out,      // drive value to pads
+    output wire [31:0]  gpio_oe,       // output-enable to pads
+
+    // Global interrupt output
+    output wire         gpio_irq
+);
+
+    // -------------------------------------------------------------------------
+    // Internal signals between blocks
+    // -------------------------------------------------------------------------
+
+    // From APB regs to pins
+    wire [31:0] gpio_dir;
+    wire [31:0] gpio_out_reg;
+
+    // From pins to debounce
+    wire [31:0] sync_gpio_in;
+
+    // From debounce to rest of system
+    wire [31:0] debounced_gpio_in;
+
+    // Debounce configuration (from regs to debounce)
+    wire [15:0] debounce_cfg;
+
+    // Interrupt configuration registers from APB
+    wire [31:0] int_mask;
+    wire [31:0] int_type;
+    wire [31:0] int_polarity;
+    wire [31:0] int_clear;   // W1C command from APB
+
+    // Interrupt status from controller to APB
+    wire [31:0] int_status;
+
+    // Signals derived for interrupt controller
+    wire [31:0] int_rise_en;
+    wire [31:0] int_fall_en;
+    wire [31:0] int_status_w1c;
+    wire [31:0] int_level_set; // level-based interrupt set
+
+    // -------------------------------------------------------------------------
+    // Pins block: pad interface + 2FF sync
+    // -------------------------------------------------------------------------
+    gpio_32_pins u_pins (
+        .PCLK         (PCLK),
+        .PRESETn      (PRESETn),
+
+        .gpio_dir     (gpio_dir),
+        .gpio_out_reg (gpio_out_reg),
+
+        .gpio_in_raw  (gpio_in_raw),
+
+        .gpio_out     (gpio_out),
+        .gpio_oe      (gpio_oe),
+
+        .sync_gpio_in (sync_gpio_in)
+    );
+
+    // -------------------------------------------------------------------------
+    // Debounce block
+    // -------------------------------------------------------------------------
+    gpio_32_debounce u_debounce (
+        .PCLK              (PCLK),
+        .PRESETn           (PRESETn),
+        .sync_gpio_in      (sync_gpio_in),
+        .debounce_cfg      (debounce_cfg),
+        .debounced_gpio_in (debounced_gpio_in)
+    );
+
+    // -------------------------------------------------------------------------
+    // APB register file
+    //   - owns: gpio_dir, gpio_out_reg, int_mask/type/polarity, debounce_cfg
+    //   - reads: debounced_gpio_in, int_status
+    //   - outputs: int_clear (W1C mask)
+    // -------------------------------------------------------------------------
+    gpio_32_apb_regs u_apb_regs (
+        .PCLK           (PCLK),
+        .PRESETn        (PRESETn),
+
+        .PSEL           (PSEL),
+        .PENABLE        (PENABLE),
+        .PWRITE         (PWRITE),
+        .PADDR          (PADDR),
+        .PWDATA         (PWDATA),
+
+        .PRDATA         (PRDATA),
+        .PREADY         (PREADY),
+        .PSLVERR        (PSLVERR),
+
+        .read_gpio_in   (debounced_gpio_in),
+        .read_int_status(int_status),
+
+        .gpio_dir       (gpio_dir),
+        .gpio_out_reg   (gpio_out_reg),
+        .int_mask       (int_mask),
+        .int_type       (int_type),
+        .int_polarity   (int_polarity),
+        .debounce_cfg   (debounce_cfg),
+        .int_clear      (int_clear)
+    );
+
+    // -------------------------------------------------------------------------
+    // Derive interrupt enables / level events for gpio_32_interrupts
+    //
+    // int_mask     : 1 = interrupt enabled
+    // int_type     : 1 = edge, 0 = level     
+    // int_polarity :
+    //   if edge : 1 = rising, 0 = falling
+    //   if level: 1 = active-high, 0 = active-low
+    //
+    // So:
+    //   rising  enable = mask & edge-type   & polarity
+    //   falling enable = mask & edge-type   & ~polarity
+    //   level-high set = mask & level-type  & polarity   &  debounced_gpio_in
+    //   level-low  set = mask & level-type  & ~polarity  & ~debounced_gpio_in
+    // -------------------------------------------------------------------------
+    // EDGE-based enables
+    assign int_rise_en = int_mask & int_type &  int_polarity;
+    assign int_fall_en = int_mask & int_type & ~int_polarity;
+
+    // LEVEL-based events
+    wire [31:0] level_high_active = int_mask & ~int_type &  int_polarity  &  debounced_gpio_in;
+    wire [31:0] level_low_active  = int_mask & ~int_type & ~int_polarity  & ~debounced_gpio_in;
+
+    assign int_level_set = level_high_active | level_low_active;
+
+    // W1C mask goes to the interrupt module
+    assign int_status_w1c = int_clear;
+
+    // -------------------------------------------------------------------------
+    // Interrupt controller
+    // -------------------------------------------------------------------------
+    gpio_32_interrupts u_interrupts (
+        .PCLK              (PCLK),
+        .PRESETn           (PRESETn),
+
+        .debounced_gpio_in (debounced_gpio_in),
+
+        .int_rise_en       (int_rise_en),
+        .int_fall_en       (int_fall_en),
+        .int_level_set     (int_level_set),
+        .int_status_w1c    (int_status_w1c),
+
+        .int_status        (int_status),
+        .gpio_irq          (gpio_irq)
+    );
+
+endmodule
