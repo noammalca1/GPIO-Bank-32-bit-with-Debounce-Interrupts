@@ -99,18 +99,25 @@ graph TD
     Pads((Physical Pads))
     end
 
-    %% Write Path
-    APB -- "PWDATA" --> Regs
+    %% APB Interface (Control & Write)
+    APB -- "PADDR, PWDATA, Control" --> Regs
+    
+    %% Internal Logic Flow
     Regs -- "gpio_out / dir" --> Sync
-    Sync -- "Drive" --> Pads
+    Regs -- "Config (Debounce)" --> Debounce
+    Regs -- "Config (Mask/Pol)" --> IntCtrl
 
-    %% Read Path
+    %% Output to Pads
+    Sync -- "Drive Output" --> Pads
+
+    %% Input from Pads
     Pads -- "Raw Input" --> Sync
     Sync -- "Synchronized" --> Debounce
     Debounce -- "Stable Signal" --> Regs
-    Regs -- "PRDATA" --> APB
-
-    %% Interrupt Path
-    Regs -- "Config (Mask/Pol)" --> IntCtrl
     Debounce -- "Clean Edges" --> IntCtrl
+
+    %% Read Back to CPU
+    Regs -- "PRDATA" --> APB
+    
+    %% Interrupt to CPU
     IntCtrl -- "gpio_irq" --> APB
