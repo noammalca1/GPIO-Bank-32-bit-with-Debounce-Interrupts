@@ -148,3 +148,23 @@ graph TD
     
     %% Interrupt Notification
     IntCtrl -- "Event Notification (IRQ)" --> APB
+
+
+### 🔬 Deep Dive: Test 1 Waveform Analysis
+
+This test validates the APB Write sequence across two transactions: setting the direction and driving the output.
+
+**Step 1: Direction Configuration (`GPIO_DIR`)**
+* **Setup Phase:** Initially, `PADDR` points to `0x00` (Direction Register) and `PWDATA` is set to `0xFF`. `PSEL` and `PWRITE` are asserted.
+* **Access Phase (Critical Timing):** On the rising clock edge where **`PENABLE` asserts High**, the APB bridge latches the data.
+* **Result:** The internal `gpio_dir` register updates to `0xFF`. Consequently, `gpio_oe` (Output Enable) immediately updates, activating the drivers for the lower 8 bits (LSBs).
+
+**Step 2: Output Data Drive (`GPIO_OUT`)**
+* **Setup Phase:** The bus targets `ADDR_GPIO_OUT` (`0x04`) with the payload `0xA5A500FF`.
+* **Access Phase:** Once again, on the rising edge where **`PENABLE` asserts High**, the `gpio_out_reg` captures the new value.
+* **Result & Masking:**
+    * `gpio_out` (internal wire) reflects the full value `0xA5A500FF`.
+    * **Physical Output:** However, since `gpio_oe` was set to `0xFF` in Step 1, only the lower byte (`0xFF`) is actively driven to the physical pads. The upper bits (`0xA5A5...`), despite having data in the register, remain in a high-impedance (Hi-Z) state externally, effectively masking the output.
+<img width="1601" height="350" alt="image" src="https://github.com/user-attachments/assets/c53f76ab-7fd1-4630-87fd-f51585b07373" />
+
+
