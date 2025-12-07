@@ -19,10 +19,15 @@ The design is fully modular and built from the ground up to handle real-world GP
 - [Introduction](#introduction)
 - [System Overview](#system-overview)
 - [Modules Description](#modules-description)
-- [Data & Control Flow](#data--control-flow)
 - [APB Register Map](#apb-register-map)
+- [GPIO Direction & Data Path](#gpio-direction--data-path)
+- [Debounce Architecture](#debounce-architecture)
+- [Interrupt System](#interrupt-system)
+- [Top-Level Integration](#top-level-integration)
 - [Verification Testbench](#verification-testbench)
 - [Simulation and Waveforms](#simulation-and-waveforms)
+- [Design Insights](#design-insights)
+- [Future Improvements](#future-improvements)
 - [License](#license)
 
 ---
