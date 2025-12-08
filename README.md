@@ -170,7 +170,7 @@ graph TD
 ```
 
 
-## Verification Testbench
+## Verification Testbench (Simulation and Waveforms)
 
 The project includes a comprehensive Verilog testbench (`tb_gpio_32.sv`) that performs the following automated tests:
 
