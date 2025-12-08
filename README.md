@@ -150,7 +150,7 @@ graph TD
 
 ## Verification Testbench
 
-The project includes a comprehensive SystemVerilog testbench (`tb_gpio_32.sv`) that performs the following automated tests:
+The project includes a comprehensive Verilog testbench (`tb_gpio_32.sv`) that performs the following automated tests:
 
 1.  **Direction & Output Test:** Configures pins as outputs and verifies driven values.
 2.  **Debounce Logic Test:** Injects short glitches (ignored) and long stable signals (accepted) to verify the debounce counter.
@@ -173,5 +173,6 @@ On the next rising edge when **`PENABLE` asserts high**, the `gpio_out_reg` upda
 - Only the `0xFF` portion is actively driven to the physical pads.
 - The upper bits (`0xA5A5...`), despite having data in the register, remain in a high-impedance state (Hi-Z) externally.
 
-![APB Write Waveform Analysis](image_910055.png)
+<img width="1614" height="362" alt="image" src="https://github.com/user-attachments/assets/f23ba249-fd70-43f2-b9df-fc01a708cbc2" />
+
 
