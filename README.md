@@ -147,5 +147,3 @@ graph TD
     IntCtrl -- "Event Notification (IRQ)" --> APB
 
 
----
-
