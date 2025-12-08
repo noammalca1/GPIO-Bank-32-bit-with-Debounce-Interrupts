@@ -26,7 +26,8 @@ The design is fully modular and built from the ground up to handle real-world GP
     - [Verification Testbench](#verification-testbench-module)
 - [Data & Control Flow](#data--control-flow)
 - [Verification Testbench (Simulation and Waveforms)](#verification-testbench-simulation-and-waveforms)
-    - [Deep Dive: Test 1 Analysis](#-deep-dive-test-1-analysis-direction--output)
+    - [Test 1 Analysis (Direction & Output)](#test-1-analysis-direction--output)
+    - [Test 2 Analysis (Debounce Logic)](#test-2-analysis-debounce-logic)
 - [Simulation and Waveforms](#simulation-and-waveforms)
 - [License](#license)
 ---
