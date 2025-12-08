@@ -18,7 +18,7 @@ The design is fully modular and built from the ground up to handle real-world GP
 
 - [Introduction](#introduction)
 - [System Overview](#system-overview)
-- [Modules Description](#modules-description)
+- [Modules & Testbench Description](#modules-description)
     - [GPIO Top-Level](#gpio-top-level)
     - [APB Register File](#apb-register-file)
     - [Pin Interface + 2-FF Synchronizer](#pin-interface--2-ff-synchronizer)
