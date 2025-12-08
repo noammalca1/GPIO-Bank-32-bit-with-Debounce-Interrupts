@@ -25,7 +25,7 @@ The design is fully modular and built from the ground up to handle real-world GP
     - [Interrupt Controller](#interrupt-controller)
     - [Verification Testbench](#verification-testbench-module)
 - [Data & Control Flow](#data--control-flow)
-- [Verification Testbench (Simulation and Waveforms)](#verification-testbench)
+- [Verification Testbench (Simulation and Waveforms)](#verification-testbench-simulation-and-waveforms)
     - [Deep Dive: Test 1 Analysis](#-deep-dive-test-1-analysis-direction--output)
 - [Simulation and Waveforms](#simulation-and-waveforms)
 - [License](#license)
