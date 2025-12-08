@@ -147,7 +147,31 @@ graph TD
     IntCtrl -- "Event Notification (IRQ)" --> APB
 ```
 
-אני רוצה להוסיף עוד דדברים מתחת לדאטה פלואו וכל פעם שאני מוסיף זה נשבר
 
+## Verification Testbench
 
+The project includes a comprehensive SystemVerilog testbench (`tb_gpio_32.sv`) that performs the following automated tests:
+
+1.  **Direction & Output Test:** Configures pins as outputs and verifies driven values.
+2.  **Debounce Logic Test:** Injects short glitches (ignored) and long stable signals (accepted) to verify the debounce counter.
+3.  **Interrupt Logic Test:** Triggers edge events and verifies that the IRQ signal asserts and clears correctly upon Write-1-to-Clear.
+
+### ▸ Deep Dive: Test 1 Analysis (Direction & Output)
+
+The first test in the verification environment focuses on validating basic APB write operations to the GPIO direction register (`GPIO_DIR`) and the output data register (`GPIO_OUT`).  
+This test demonstrates correct APB timing, register update behavior, and propagation of control signals into the GPIO pins module.
+
+#### Waveform Analysis - Step-by-Step
+
+**1. Direction Configuration (`GPIO_DIR`):** Upon the clock's rising edge, the testbench asserts `PSEL` and `PWRITE`, while updating `PWDATA` to `0xFF`. Although `PADDR` points to `0x00` (which might not show a visible transition if the bus was previously zero), the address is valid.  
+Crucially, the data is latched into the internal `gpio_dir` register (in the APB module) only when **`PENABLE` asserts high** (Access Phase). This update immediately propagates to the Pins module, where `gpio_oe` (Output Enable) is updated to match. This confirms that the 8 Least Significant Bits (LSBs) are now configured as **outputs**.
+
+**2. Output Data Drive (`GPIO_OUT`):** Subsequently, a write transaction targets `ADDR_GPIO_OUT`. `PADDR` updates to `0x04` and `PWDATA` updates to `0xA5A500FF`.  
+On the next rising edge when **`PENABLE` asserts high**, the `gpio_out_reg` updates, and simultaneously `gpio_out` reflects the value `0xA5A500FF`.
+
+**Observation (Masking Effect):** Although `gpio_out` holds the full `0xA5A500FF` pattern, since we only configured the lower 8 bits as OUTPUTs in the previous step, the physical effect is **masked**:
+- Only the `0xFF` portion is actively driven to the physical pads.
+- The upper bits (`0xA5A5...`), despite having data in the register, remain in a high-impedance state (Hi-Z) externally.
+
+![APB Write Waveform Analysis](image_910055.png)
 
