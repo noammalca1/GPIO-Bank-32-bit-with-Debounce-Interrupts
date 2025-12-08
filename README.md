@@ -156,7 +156,7 @@ The project includes a comprehensive Verilog testbench (`tb_gpio_32.sv`) that pe
 2.  **Debounce Logic Test:** Injects short glitches (ignored) and long stable signals (accepted) to verify the debounce counter.
 3.  **Interrupt Logic Test:** Triggers edge events and verifies that the IRQ signal asserts and clears correctly upon Write-1-to-Clear.
 
-### ▸ Deep Dive: Test 1 Analysis (Direction & Output)
+### Test 1 Analysis (Direction & Output)
 
 The first test in the verification environment focuses on validating basic APB write operations to the GPIO direction register (`GPIO_DIR`) and the output data register (`GPIO_OUT`).  
 This test demonstrates correct APB timing, register update behavior, and propagation of control signals into the GPIO pins module.
