@@ -8,7 +8,7 @@ Full APB based 32 bit GPIO peripheral featuring 2FF input synchronization, progr
 **Focus:** Digital Design - GPIO, APB, Debounce, and Interrupts
 
 This project implements a complete 32-bit GPIO peripheral in Verilog HDL, suitable for integration into APB-based SoC designs.  
-It includes a memory-mapped APB register file, a 2-flop input synchronizer, per-bit digital debounce, a configurable edge/level interrupt controller, and a self-checking SystemVerilog testbench (`tb_gpio_32`) that verifies GPIO direction, debounce behavior, and interrupt functionality.
+It includes a memory-mapped APB register file, a 2-flop input synchronizer, per-bit digital debounce, a configurable edge/level interrupt controller, and a self-checking Verilog testbench (`tb_gpio_32`) that verifies GPIO direction, debounce behavior, and interrupt functionality.
 
 The design is fully modular and built from the ground up to handle real-world GPIO use cases such as button inputs, status signals, and event-driven interrupts, while protecting against metastability and mechanical switch bounce.
 
@@ -46,7 +46,7 @@ This project demonstrates a robust 32-bit General-Purpose Input/Output (GPIO) pe
 - Configurable edge and level interrupts with per-bit masking and polarity  
 - A single bank-level interrupt output (`gpio_irq`)
 
-The system is implemented and verified in Verilog/SystemVerilog using a 100 MHz clock (`PCLK`) with a VCD waveform dump (`dump.vcd`) for inspection in tools such as GTKWave.
+The system is implemented and verified in Verilog using a 100 MHz clock (`PCLK`) with a VCD waveform dump (`dump.vcd`) for inspection in tools such as GTKWave.
 
 ---
 ## System Overview
@@ -71,7 +71,7 @@ The design is split into four main RTL blocks, connected by a clean top-level mo
 │   ├── gpio_32_debounce.v     # Debounce logic
 │   ├── gpio_32_interrupts.v   # Interrupt controller
 │   ├── gpio_32_pins.v         # Pad interface & Synchronizer
-│   └── tb_gpio_32.v           # SystemVerilog testbench
+│   └── tb_gpio_32.v           # Verilog testbench
 ├── docs/                      # Documentation assets (Images/Waveforms)
 ├── LICENSE                    # MIT License
 └── README.md                  # Project Documentation
@@ -135,7 +135,7 @@ A flexible interrupt generation unit.
 ### Verification Testbench (Module)
 **File:** [`tb.v`](Verilog_Code/tb.v)
 
-A comprehensive SystemVerilog testbench used to validate the design.
+A comprehensive Verilog testbench used to validate the design.
 * **Tests:** Includes directed tests for basic I/O, glitch injection (to prove debounce), rising-edge detection, and level-triggered interrupt clearance sequences.
 ---
 
