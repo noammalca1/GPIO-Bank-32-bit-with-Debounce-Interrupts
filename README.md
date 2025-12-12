@@ -133,7 +133,7 @@ A flexible interrupt generation unit.
 ---
 
 ### Verification Testbench (Module)
-**File:** [`tb.v`](Verilog_Code/tb.v)
+**File:** [`tb_gpio_32.v`](Verilog_Code/tb_gpio_32.v)
 
 A comprehensive Verilog testbench used to validate the design.
 * **Tests:** Includes directed tests for basic I/O, glitch injection (to prove debounce), rising-edge detection, and level-triggered interrupt clearance sequences.
@@ -190,7 +190,7 @@ graph TD
 
 ## Verification Testbench (Simulation and Waveforms)
 
-The project includes a Verilog testbench (`tb.v`) that performs the following automated tests:
+The project includes a Verilog testbench (`tb_gpio_32.v`) that performs the following automated tests:
 
 1.  **Direction & Output Test:** Configures pins as outputs and verifies driven values.
 2.  **Debounce Logic Test:** Injects short glitches (ignored) and long stable signals (accepted) to verify the debounce counter.
