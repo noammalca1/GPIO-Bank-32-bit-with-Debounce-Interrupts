@@ -49,17 +49,15 @@ This project demonstrates a robust 32-bit General-Purpose Input/Output (GPIO) pe
 The system is implemented and verified in Verilog/SystemVerilog using a 100 MHz clock (`PCLK`) with a VCD waveform dump (`dump.vcd`) for inspection in tools such as GTKWave.
 
 ---
-
 ## System Overview
 
 The design is split into four main RTL blocks, connected by a clean top-level module:
-
+- **gpio_32_top`** – Top level module
 - **`gpio_32_apb_regs`** – APB register file  
-- **`gpio_32_pins`** – pad interface + 2-FF synchronizer  
-- **`gpio_32_debounce`** – per-bit digital debounce engine  
-- **`gpio_32_interrupts`** – edge/level interrupt controller  
-
-Top-level module: **`gpio_32_top`** Testbench: **`tb_gpio_32`**
+- **`gpio_32_pins`** – Pad interface + 2FF synchronizer  
+- **`gpio_32_debounce`** – Debounce engine  
+- **`gpio_32_interrupts`** – Edge/Level interrupt controller  
+- **`tb_gpio_32`**- Testbench
 
 ---
 
