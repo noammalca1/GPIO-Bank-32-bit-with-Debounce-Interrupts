@@ -77,7 +77,7 @@ Top-level module: **`gpio_32_top`** Testbench: **`tb_gpio_32`**
 ├── docs/                      # Documentation assets (Images/Waveforms)
 ├── LICENSE                    # MIT License
 └── README.md                  # Project Documentation
-
+```
 ## Modules Description
 
 ### GPIO Top-Level
