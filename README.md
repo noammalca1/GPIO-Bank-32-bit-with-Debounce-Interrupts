@@ -28,6 +28,8 @@ The design is fully modular and built from the ground up to handle real-world GP
 - [Verification Testbench (Simulation and Waveforms)](#verification-testbench-simulation-and-waveforms)
     - [Test 1 Analysis (Direction & Output)](#test-1-analysis-direction--output)
     - [Test 2 Analysis (Debounce Logic)](#test-2-analysis-debounce-logic)
+    - [Test 3 Analysis (Interrupt Logic - Rising Edge)](#test-3-analysis-interrupt-logic---rising-edge)
+    - [Test 4 Analysis (Interrupt Logic - Level High)](#test-4-analysis-interrupt-logic---level-high)
 - [Simulation and Waveforms](#simulation-and-waveforms)
 - [License](#license)
 ---
