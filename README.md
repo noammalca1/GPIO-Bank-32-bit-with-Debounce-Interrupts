@@ -207,7 +207,7 @@ Crucially, the data is latched into the internal `gpio_dir` register (in the APB
 **2. Output Data Drive (`GPIO_OUT`):** Subsequently, a write transaction targets `ADDR_GPIO_OUT`. `PADDR` updates to `0x04` and `PWDATA` updates to `0xA5A500FF`.  
 On the next rising edge when **`PENABLE` asserts high**, the `gpio_out_reg` updates, and simultaneously `gpio_out` reflects the value `0xA5A500FF`.
 
-**Observation (Masking Effect):** Although `gpio_out` holds the full `0xA5A500FF` pattern, since we only configured the lower 8 bits as OUTPUTs in the previous step, the physical effect is **masked**:
+**Observation (Masking Effect):** Although `gpio_out` holds the full `0xA5A500FF` pattern, since the testbench only configured the lower 8 bits as OUTPUTs in the previous step, the physical effect is **masked**:
 - Only the `0xFF` portion is actively driven to the physical pads.
 - The upper bits (`0xA5A5...`), despite having data in the register, remain in a high-impedance state (Hi-Z) externally.
 
