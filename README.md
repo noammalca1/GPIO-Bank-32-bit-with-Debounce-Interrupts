@@ -46,8 +46,6 @@ This project demonstrates a robust 32-bit General-Purpose Input/Output (GPIO) pe
 - Configurable edge and level interrupts with per-bit masking and polarity  
 - A single bank-level interrupt output (`gpio_irq`)
 
-The system is implemented and verified in Verilog using a 100 MHz clock (`PCLK`) with a VCD waveform dump (`dump.vcd`) for inspection in tools such as GTKWave.
-
 ---
 ## System Overview
 
