@@ -1,5 +1,5 @@
 # GPIO-Bank-32-bit-with-Debounce-Interrupts
-Full APB based 32 bit GPIO peripheral featuring 2FF input synchronization, programmable debounce, edge/level interrupt controller, and a clean top level integration of pins and APB register file.
+Full APB based 32 bit GPIO peripheral featuring 2FF input synchronization, programmable debounce, edge/level interrupt controller, with strucured top level integration of pins and APB register file.
 
 # 32-Bit APB GPIO Bank with Debounce & Interrupts (Verilog HDL)
 
