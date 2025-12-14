@@ -274,38 +274,38 @@ The testbench drives `gpio_in_raw[0]` Low for 2 cycles, then transitions it to *
 
 ### Test 4 Analysis (Interrupt Logic - Level High)
 
-This test verifies the interrupt generation path for level-sensitive signals, specifically demonstrating the continuous assertion behavior and the inability to permanently clear an interrupt while the external physical condition persists.
+This testbench verifies the interrupt generation path for level-sensitive signals, specifically demonstrating the continuous assertion behavior and the inability to permanently clear an interrupt while the external physical condition persists.
 
 #### Waveform Analysis - Step-by-Step
 
-**1. Configuration Sequence :**
-The test configures bit 0 for a **Level-Sensitive Active-High Interrupt**.
-* First, we configure the filter by writing `0x2` to `DEBOUNCE_CFG` (2 clock cycles).
-* We set `INT_TYPE` to `0` (Level) and `INT_POLARITY` to `1` (Active High).
-* **Enable:** We write to `INT_MASK` to enable the interrupt.
-* Finally, we perform a W1C to `INT_STATUS` to ensure a clean starting state, clearing any potential glitches that occurred during configuration.
+**1. Configuration Sequence**
+The **testbench** configures bit 0 for a **Level-Sensitive Active-High Interrupt**.
+* First, the filter is configured by the **testbench** writing `0x2` to `DEBOUNCE_CFG` (2 clock cycles).
+* The `INT_TYPE` is set to `0` (Level) and `INT_POLARITY` to `1` (Active High).
+* **Enable:** The **testbench** writes to `INT_MASK` to enable the interrupt.
+* Finally, a W1C operation is performed on `INT_STATUS` to ensure a clean starting state, clearing any potential glitches that occurred during configuration.
 
-**2. Stimulus & Propagation:**
-The test ensures the input is Low, then drives `gpio_in_raw[0]` to **High** and holds it.
-* **Latency:** After the synchronization and debounce period (approx 3-4 cycles total), `debounced_gpio_in[0]` updates to `1`.
+**2. Stimulus & Propagation**
+The **testbench** ensures the input is Low, then drives `gpio_in_raw[0]` to **High** and holds it.
+* **Latency:** After the synchronization and debounce period (approx. 3-4 cycles total), `debounced_gpio_in[0]` updates to `1`.
 * **Internal Logic Chain:**
     1.  The level detector logic evaluates true: `level_high_active = debounced_gpio_in & int_pol_high` becomes `1`.
     2.  The masking logic passes the signal: `int_level_set = (level_high_active & int_level_en)` becomes `1`.
     3.  **Continuous Set:** Unlike the pulse in Test 3, `int_set_total` remains **constantly high**.
-    4.  **Output:** The global `gpio_irq` asserts high immediately.
+* **Output:** The global `gpio_irq` asserts high immediately.
 
-**3. The "Clear" Experiment (Level vs. Edge):**
-This is the critical part of the test. While `gpio_in_raw[0]` is still **High**, the test issues a **Write-1-to-Clear** (W1C) command to `INT_STATUS`.
+**3. The "Clear" Experiment (Level vs. Edge)**
+This is the critical part of the test. While `gpio_in_raw[0]` is still **High**, the **testbench** issues a **Write-1-to-Clear** (W1C) command to `INT_STATUS`.
 * **Immediate Effect:** For exactly one clock cycle, `int_status` might drop or the `gpio_irq` de-asserts because `int_status_w1c` is active.
 * **Next Cycle Re-assertion:** Since the input is still High, the combinational logic `int_level_set` is still `1`.
 * **Result:** In the very next rising edge, the status register logic:
     `int_status <= (int_status | int_set_total) & ~int_status_w1c;`
     captures the `1` again. The interrupt "bounces" back immediately.
 
-**4. De-assertion & Clean Exit:**
-* The test drives `gpio_in_raw[0]` **Low**.
+**4. De-assertion & Clean Exit**
+The **testbench** drives `gpio_in_raw[0]` Low.
 * Now, the internal `int_level_set` signal drops to `0`.
-* The test performs a second **Write-1-to-Clear**.
+* The **testbench** performs a second **Write-1-to-Clear**.
 * **Result:** Since `int_set_total` is now `0`, the W1C successfully forces `int_status` to `0` and it stays there. The `gpio_irq` line permanently de-asserts.
 
 <img width="1850" height="472" alt="image" src="https://github.com/user-attachments/assets/9e272968-7e41-47c5-8dfa-95f8cca78dd7" />
