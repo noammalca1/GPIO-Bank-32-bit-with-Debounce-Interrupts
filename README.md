@@ -225,7 +225,7 @@ First, the testbench writes `0x0004` to `DEBOUNCE_CFG`. This sets the threshold:
 Next, `GPIO_DIR` is configured to `0xFE` (bits 1-7 are Outputs, bit 0 is an **Input**).
 
 **2. The Glitch (Rejection):**
-We inject a noisy sequence into `gpio_in_raw[0]`: logic `1` $\to$ `0` $\to$ `1` $\to$ `0`, with each state lasting only a single clock cycle.
+The testbench injects a noisy sequence into `gpio_in_raw[0]`: logic `1` $\to$ `0` $\to$ `1` $\to$ `0`, with each state lasting only a single clock cycle.
 * **2FF Latency:** Notice that the internal debounce counter begins incrementing **2 clock cycles after** the external change. This delay is due to the 2-Flip-Flop synchronizer (`sync_gpio_in`).
 * **Counter Behavior:** The counter attempts to increment when the synchronized value differs from the current `debounced_gpio_in`. However, since the input toggles before the counter reaches the threshold of 4, the logic resets the counter.
 * **Result:** `debounced_gpio_in` remains `0`. An APB read transaction confirms that the CPU sees `0`, meaning the noise was successfully filtered out.
