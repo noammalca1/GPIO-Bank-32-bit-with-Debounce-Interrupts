@@ -2,7 +2,8 @@
 ---
 **Author:** Noam Malca  
 **Institution:** Bar-Ilan University  
-**Focus:** Digital Design - GPIO, APB, Debounce, and Interrupts
+**Focus:** Digital Design - GPIO, APB, Debounce, and Interrupts.
+
 Full APB based 32 bit GPIO peripheral featuring 2FF input synchronization, programmable debounce, edge/level interrupt controller, with strucured top level integration of pins and APB register file.
 This project implements a complete 32-bit GPIO peripheral in Verilog HDL, suitable for integration into APB-based SoC designs.  
 It includes a memory-mapped APB register file, a 2 flip-flop input synchronizer, per-bit digital debounce, a configurable edge/level interrupt controller, and a self-checking Verilog testbench (`tb_gpio_32`) that verifies GPIO direction, debounce behavior, and interrupt functionality.
